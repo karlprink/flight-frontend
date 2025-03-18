@@ -53,7 +53,7 @@ export default {
       // Filtrid rakendatakse automaatselt computed property kaudu
     },
     selectFlight(flight) {
-      router.push("/seatplan")
+      router.push({ name: "SeatPlan", params: { flightId: flight.id } })
     },
   },
   created() {

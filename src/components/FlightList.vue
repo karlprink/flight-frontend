@@ -9,14 +9,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['filteredFlights', 'selectFlight'],
-  methods: {
-    selectFlight(flight) {
-      this.$router.push('/seatplan');
-    },
-  },
+<script setup>
+
+const emit = defineEmits("selectFlight")
+
+const selectFlight = (flight) => {
+  emit("selectFlight", flight)
 };
 </script>
 
