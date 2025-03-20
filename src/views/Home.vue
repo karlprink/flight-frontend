@@ -65,15 +65,58 @@ export default {
 <style>
 .filters {
   margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .flights {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
+
 .flights div {
-  padding: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 5px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
+
+.flights div:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #e6f7ff;
+}
+
+.flights div:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.flights div h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+  font-weight: bold;
+}
+
+.flights div p {
+  margin: 5px 0 0;
+  color: #666;
+  font-size: 1em;
+}
+
+.flights div:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.flights div:nth-child(even) {
+  background-color: #f0f8ff;
+}
+
+
 </style>

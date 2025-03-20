@@ -1,53 +1,62 @@
 <template>
   <div>
-    <SeatFilters :seatFilters="seatFilters" @applySeatFilters="applySeatFilters" />
-    <SeatMap :seats="seats" @selectSeat="selectSeat" />
+    <SeatFilters v-model="seatFilters" @applySeatFilters="applySeatFilters" />
+    <SeatMap :seats="filteredSeats" @selectSeat="selectSeat" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import SeatFilters from "../components/SeatFilters.vue";
 import SeatMap from "../components/SeatMap.vue";
-import {useRoute} from "vue-router";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const flightId = route.params.flightId;
 
 const seats = ref([]);
 const seatFilters = ref({
+  business: false, // Default value for business class
   window: false,
   legroom: false,
   exit: false,
   groupSize: 1,
 });
 
-const fetchSeats = async (flightId) => {
+// Istekohtade päring API-st
+const fetchSeats = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/api/flights/${flightId}/seats`);
     seats.value = response.data;
   } catch (error) {
-    console.error("Error fetching flights:", error);
+    console.error("Error fetching seats:", error);
   }
 };
 
+// Filtreeritud istekohad
+const filteredSeats = computed(() => {
+  return seats.value.map((seat) => {
+    const matchesBusiness = !seatFilters.value.business || seat.seatClass.toLowerCase() === 'business';
+    const matchesWindow = !seatFilters.value.window || seat.closeToWindow;
+    const matchesLegroom = !seatFilters.value.legroom || seat.extraLegRoom;
+    const matchesExit = !seatFilters.value.exit || seat.closeToExit;
+
+    const isMatching = matchesBusiness && matchesWindow && matchesLegroom && matchesExit && seat.available;
+
+    return { ...seat, isMatching };
+  });
+});
+
 const selectSeat = (seat) => {
-  if (!seat.occupied) {
-    alert(`Valisid istekoha: ${seat.label}`);
+  if (seat.available) {
+    alert(`Valisid istekoha: ${seat.seatNumber}`);
   }
 };
 
 const applySeatFilters = () => {
-  const recommendedSeats = seats.value.filter((seat) => {
-    if (seatFilters.value.window && seat.type !== "window") return false;
-    if (seatFilters.value.legroom && seat.type !== "legroom") return false;
-    if (seatFilters.value.exit && seat.type !== "exit") return false;
-    return !seat.occupied;
-  });
-
-  alert(`Soovitatud istekohad: ${recommendedSeats.map((seat) => seat.label).join(", ")}`);
+  alert(`Soovitatud istekohad: ${filteredSeats.value.map((seat) => seat.seatNumber).join(", ")}`);
 };
 
-onMounted(() => fetchSeats(flightId));
+onMounted(fetchSeats);
 </script>

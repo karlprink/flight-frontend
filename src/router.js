@@ -4,7 +4,7 @@ import SeatPlan from './views/SeatPlan.vue';
 
 const routes = [
     { path: '/', component: Home },
-    { name: "SeatPlan", path: "/flight/:flightId/seatplan", component: SeatPlan, props: true},
+    { name: "SeatPlan", path: "/flight/:flightId/seatplan", component: SeatPlan, props: true}
 ];
 
 const router = createRouter({

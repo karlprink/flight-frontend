@@ -10,6 +10,9 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  filteredFlights: Array,
+})
 
 const emit = defineEmits("selectFlight")
 
