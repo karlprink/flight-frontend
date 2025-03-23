@@ -1,3 +1,10 @@
+<!--
+See komponent kuvab lennufiltrid ja lennuloendi.
+Kasutajad saavad filtreerida lende erinevate kriteeriumite alusel ja valida lennu, et näha istmete plaani.
+
+Stiili loomisel kasutatud AI abi.
+-->
+
 <template>
   <div>
     <FlightFilters :filters="filters" @applyFlightFilters="applyFlightFilters" />
@@ -25,21 +32,29 @@ export default {
         price: null,
       },
       flights: [],
-      selectedFlight: null,
+      error: null,
     };
   },
   computed: {
     filteredFlights() {
       return this.flights.filter((flight) => {
+        const { destination, date, time, price } = this.filters;
+
+
+        let flightDate = flight.departure ? new Date(flight.departure).toISOString().split("T")[0] : "";
+        let flightTime = flight.departure ? new Date(flight.departure).toISOString().split("T")[1].slice(0, 5) : "";
+
         return (
-            (!this.filters.destination || flight.destination.includes(this.filters.destination)) &&
-            (!this.filters.date || flight.date === this.filters.date) &&
-            (!this.filters.time || flight.time === this.filters.time) &&
-            (!this.filters.price || flight.price <= this.filters.price)
+            (!destination || flight.destination.toLowerCase().includes(destination.toLowerCase())) &&
+            (!date || flightDate === date) &&
+            (!time || flightTime === time) &&
+            (!price || flight.price <= price)
         );
       });
     },
   },
+
+
   methods: {
     async fetchFlights() {
       try {
@@ -47,13 +62,13 @@ export default {
         this.flights = response.data;
       } catch (error) {
         console.error('Error fetching flights:', error);
+        this.error = "Lennupiletite laadimine ebaõnnestus!";
       }
     },
     applyFlightFilters() {
-      // Filtrid rakendatakse automaatselt computed property kaudu
     },
     selectFlight(flight) {
-      router.push({ name: "SeatPlan", params: { flightId: flight.id } })
+      router.push({ name: "SeatPlan", params: { flightId: flight.id } });
     },
   },
   created() {
@@ -63,20 +78,6 @@ export default {
 </script>
 
 <style>
-.filters {
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f0f8ff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.flights {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .flights div {
   padding: 15px;
   border: 1px solid #ddd;

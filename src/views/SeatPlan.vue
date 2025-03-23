@@ -1,7 +1,15 @@
+<!--
+See Vue.js komponent kuvab istmefiltrid ja istmeplaani.
+Kasutajad saavad filtreerida istmeid erinevate kriteeriumite alusel ja valida istme.
+
+Stiili loomisel kasutatud AI abi.
+-->
+
+
 <template>
   <div>
     <SeatFilters v-model="seatFilters" @applySeatFilters="applySeatFilters" />
-    <SeatMap :seats="filteredSeats" @selectSeat="selectSeat" />
+    <SeatMap :seats="filteredSeats" :flightId="flightId" @selectSeat="selectSeat" />
   </div>
 </template>
 
@@ -17,7 +25,7 @@ const flightId = route.params.flightId;
 
 const seats = ref([]);
 const seatFilters = ref({
-  business: false, // Default value for business class
+  business: false,
   window: false,
   legroom: false,
   exit: false,
@@ -34,9 +42,32 @@ const fetchSeats = async () => {
   }
 };
 
+
+const findAdjacentSeats = (seats, groupSize) => {
+  const rows = seats.reduce((acc, seat) => {
+    const rowNumber = seat.seatNumber.match(/\d+/)[0];
+    if (!acc[rowNumber]) acc[rowNumber] = [];
+    acc[rowNumber].push(seat);
+    return acc;
+  }, {});
+
+  const adjacentSeats = [];
+  for (const row in rows) {
+    const sortedRow = rows[row].sort((a, b) => a.seatNumber.localeCompare(b.seatNumber));
+    for (let i = 0; i <= sortedRow.length - groupSize; i++) {
+      const group = sortedRow.slice(i, i + groupSize);
+      if (group.every(seat => seat.available)) {
+        adjacentSeats.push(...group);
+        i += groupSize - 1;
+      }
+    }
+  }
+  return adjacentSeats;
+};
+
 // Filtreeritud istekohad
 const filteredSeats = computed(() => {
-  return seats.value.map((seat) => {
+  const individualFilteredSeats = seats.value.map((seat) => {
     const matchesBusiness = !seatFilters.value.business || seat.seatClass.toLowerCase() === 'business';
     const matchesWindow = !seatFilters.value.window || seat.closeToWindow;
     const matchesLegroom = !seatFilters.value.legroom || seat.extraLegRoom;
@@ -46,6 +77,16 @@ const filteredSeats = computed(() => {
 
     return { ...seat, isMatching };
   });
+
+  if (seatFilters.value.groupSize > 1) {
+    const adjacentSeats = findAdjacentSeats(individualFilteredSeats, seatFilters.value.groupSize);
+    return individualFilteredSeats.map(seat => ({
+      ...seat,
+      isMatching: adjacentSeats.includes(seat)
+    }));
+  }
+
+  return individualFilteredSeats;
 });
 
 const selectSeat = (seat) => {

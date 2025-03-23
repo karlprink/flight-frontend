@@ -1,3 +1,9 @@
+<!--
+See komponent võimaldab kasutajatel filtreerida lende erinevate kriteeriumite alusel.
+
+Stiili loomisel kasutatud AI abi.
+-->
+
 <template>
   <div class="filters">
     <label>
@@ -16,7 +22,7 @@
       Hind:
       <input type="number" v-model="filters.price" />
     </label>
-    <button @click="applyFlightFilters">Rakenda filtrid</button>
+
   </div>
 </template>
 
@@ -36,6 +42,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
 }
 

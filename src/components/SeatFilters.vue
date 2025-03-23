@@ -1,50 +1,49 @@
+<!--
+See komponent võimaldab kasutajatel filtreerida istmeid erinevate kriteeriumite alusel.
+
+Stiili loomisel kasutatud AI abi.
+-->
+
 <template>
   <div class="seat-filters">
     <label>
-      <input type="checkbox" :checked="modelValue.business"
-             @change="$emit('update:modelValue', { ...modelValue, business: $event.target.checked })"/>
+      <input type="checkbox" v-model="modelValue.business" />
       Business klass
     </label>
     <label>
-      <input type="checkbox" :checked="modelValue.window"
-             @change="$emit('update:modelValue', { ...modelValue, window: $event.target.checked })"/>
+      <input type="checkbox" v-model="modelValue.window" />
       Istekoht akna all
     </label>
     <label>
-      <input type="checkbox" :checked="modelValue.legroom"
-             @change="$emit('update:modelValue', { ...modelValue, legroom: $event.target.checked })"/>
+      <input type="checkbox" v-model="modelValue.legroom" />
       Rohkem jalaruumi
     </label>
     <label>
-      <input type="checkbox" :checked="modelValue.exit"
-             @change="$emit('update:modelValue', { ...modelValue, exit: $event.target.checked })"/>
+      <input type="checkbox" v-model="modelValue.exit" />
       Lähedal väljapääsule
     </label>
     <label>
-      <input type="number" :value="modelValue.groupSize" min="1"
-             @input="$emit('update:modelValue', { ...modelValue, groupSize: +$event.target.value })"/>
+      <input type="number" v-model.number="modelValue.groupSize" min="1" />
       Istekohad kõrvuti
     </label>
-    <button @click="$emit('applySeatFilters')">Rakenda filtrid</button>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    modelValue: {
-      type: Object,
-      default: () => ({
-        business: false,
-        window: false,
-        legroom: false,
-        exit: false,
-        groupSize: 1
-      })
-    }
+<script setup>
+defineProps({
+  modelValue: {
+    type: Object,
+    default: () => ({
+      business: false,
+      window: false,
+      legroom: false,
+      exit: false,
+      groupSize: 1
+    })
   }
-};
+})
 </script>
+
 
 <style>
 .seat-filters {
@@ -55,6 +54,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
 }
 
